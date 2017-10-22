@@ -85,7 +85,7 @@
             
             /* --- Private functions --- */
             
-            render = function(){
+            const render = function(){
                 let container = self.ccm.helper.html(my.html.container);
                 let newTile = {};
                 
@@ -106,7 +106,7 @@
                 self.element.appendChild(container);
             };
             
-            createTile = function( tileData ){
+            const createTile = function( tileData ){
                 let textNode = {};
                 let iconElem = {};
                 let headlineElem = {};
@@ -134,7 +134,7 @@
                 return newTile;
             };
             
-            onTileClick = function( event ){
+            const onTileClick = function( event ){
                 if(typeof(event.target.action) === 'function')
                     event.target.action();
             };
