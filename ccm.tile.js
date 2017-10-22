@@ -28,8 +28,8 @@
         ccm : "https://akless.github.io/ccm/ccm.js",
         config: {
             "tiles":[],
-            "singelTileStyle":["ccm.load", "tile-default.css"],
-            "overallStyle": ["ccm.load", "overall-default.css"],
+            "singelTileStyle":["ccm.load", "./tile-default.css"],
+            "overallStyle": ["ccm.load", "./overall-default.css"],
             "order": "asc",
             "html":{
                 "container":{
