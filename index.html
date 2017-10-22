@@ -61,6 +61,7 @@ THE SOFTWARE.
                             "icon":"dummy.svg",
                             "headline":"Headline 4",
                             "subline":"Subline 4",
+                            "id": "1",
                             "action": function(){console.log("ddd");}
                         }
                     ]
@@ -73,6 +74,7 @@ THE SOFTWARE.
                             "action": function(){console.log("eee");}
                         }
                     );
+                    instance.setAction("1", function(){console.log('new action');});
                 }
             );
         </script>

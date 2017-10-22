@@ -73,6 +73,7 @@
             
             /* --- Public functions --- */
             
+            // Add and render a new tile
             this.addTile = function( tile, callback ){
                 let container = self.element.querySelector('.container');
                 let tileElem = createTile(tile);
@@ -80,7 +81,22 @@
                     container.appendChild(tileElem);
                 if(my.order === "desc")
                     container.insertBefore(tileElem, container.childNodes[0]);
+                my.tiles.push(tile);
                 if(callback) callback();
+            };
+            
+            // Set an action of a existing tile by its ID
+            // Action should be a function ref, otherwise ignored later
+            this.setAction = function( tileID, action ){
+                let i=0;
+                while(i<my.tiles.length){
+                    if(my.tiles[i].id === tileID)
+                        my.tiles[i].action = action;
+                    i++;
+                }
+                let tile = self.element.querySelector('.tile-id-'+tileID);
+                if(tile)
+                    tile.action = action;
             };
             
             /* --- Private functions --- */
@@ -128,6 +144,9 @@
                     textNode = document.createTextNode(tileData.subline);
                     sublineElem.appendChild(textNode);
                     newTile.appendChild(sublineElem);
+                }
+                if(tileData.id){
+                    newTile.classList.add('tile-id-'+tileData.id);
                 }
                 newTile.action = tileData.action;
                 newTile.addEventListener('click', onTileClick);
