@@ -34,7 +34,7 @@ THE SOFTWARE.
         <div class="tile"></div>
         <script>
             ccm.start(
-                'ccm.tile.js',
+                './ccm.tile.js',
                 {
                     "root": document.querySelector('.tile'),
                     "order": "desc",
@@ -43,26 +43,37 @@ THE SOFTWARE.
                             "icon":"dummy.svg",
                             "headline":"Headline 1",
                             "subline":"This is a short description of the content behind this tile. ",
-                            "action": function(){console.log("aaa");}
+                            "action": function(){console.log("aaa");},
+                            "route": "/tile1"
                         },
                         {
                             "icon":"dummy.svg",
                             "headline":"Headline 2",
                             "subline":"Subline 2",
-                            "action": function(){console.log("bbb");}
+                            "action": function(){console.log("bbb");},
+                            "route": "/tile2"
                         },
                         {
                             "icon":"dummy.svg",
                             "headline":"Headline 3",
                             "subline":"Subline 3",
-                            "action": function(){console.log("ccc");}
+                            "action": function(){console.log("ccc");},
+                            "route": "/tile3"
                         },
                         {
                             "icon":"dummy.svg",
                             "headline":"Headline 4",
                             "subline":"Subline 4",
                             "id": "1",
-                            "action": function(){console.log("ddd");}
+                            "action": function(){console.log("ddd");},
+                            "route": "/tile4"
+                        }
+                    ],
+                    "router":[
+                        "ccm.start", 
+                        "https://moritzkemp.github.io/ccm-route_node/ccm.route_node.js",
+                        {
+                            "isRoot": true
                         }
                     ]
                 }, function( instance ){
@@ -71,7 +82,8 @@ THE SOFTWARE.
                             "icon":"dummy.svg",
                             "headline":"Headline 5",
                             "subline":"This is a short description of the content behind this tile, No. 5. ",
-                            "action": function(){console.log("eee");}
+                            "action": function(){console.log("eee");},
+                            "route": "/tile5"
                         }
                     );
                     instance.setAction("1", function(){console.log('new action');});

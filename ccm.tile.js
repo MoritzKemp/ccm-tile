@@ -55,11 +55,13 @@
                     "tag":"div",
                     "class":"subline"
                 }
-            }
+            },
+            "router": ["ccm.start", "https://moritzkemp.github.io/ccm-route_node/ccm.route_node.js"]
         },
         Instance: function(){
             const self = this;
             let my = {};
+            let internalID = 0;
             
             this.ready = function( callback ){
                 my = self.ccm.helper.privatize(self);
@@ -68,6 +70,14 @@
             
             this.start = function( callback ){
                 render();
+                // Configure router
+                self.router.addObserver(navigateTo);
+                let patterns = [];
+                my.tiles.forEach((tile)=>{
+                    if(tile.route)
+                        patterns.push(tile.route);
+                });
+                self.router.setPatterns(patterns);
                 if(callback) callback();  
             };
             
@@ -76,6 +86,7 @@
             // Add and render a new tile
             this.addTile = function( tile, callback ){
                 let container = self.element.querySelector('.container');
+                tile.internalID = internalID++;
                 let tileElem = createTile(tile);
                 if(my.order === "asc")
                     container.appendChild(tileElem);
@@ -107,13 +118,14 @@
                 
                 if(my.order === "asc") {
                     for(let i=0; i<my.tiles.length; i++){
+                        my.tiles[i].internalID = internalID++;
                         newTile = createTile( my.tiles[i] );
                         container.appendChild(newTile);
                     }
                 }
-                
                 if(my.order === "desc") {
                     for(let i=my.tiles.length-1; i>=0; i--){
+                        my.tiles[i].internalID = internalID++;
                         newTile = createTile( my.tiles[i] );
                         container.appendChild(newTile);
                     }
@@ -148,14 +160,33 @@
                 if(tileData.id){
                     newTile.classList.add('tile-id-'+tileData.id);
                 }
+                newTile.classList.add('internal-id-'+tileData.internalID);
                 newTile.action = tileData.action;
                 newTile.addEventListener('click', onTileClick);
                 return newTile;
             };
             
             const onTileClick = function( event ){
-                if(typeof(event.target.action) === 'function')
-                    event.target.action();
+                const tileElem = event.target;
+                if(typeof(tileElem.action) === 'function')
+                    tileElem.action();
+                my.tiles.forEach((tile)=>{
+                    if(
+                        tileElem.classList.contains('internal-id-'+tile.internalID) &&
+                        tile.route
+                    ){
+                        self.router.navigatedTo(tile.route);
+                    }
+                });
+                
+            };
+            
+            const navigateTo = function( route ){
+                my.tiles.forEach((tile)=>{
+                    if(tile.route === route && typeof(tile.action) === 'function'){
+                        tile.action();
+                    }
+                });
             };
         }
     };
