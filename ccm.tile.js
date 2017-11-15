@@ -28,8 +28,8 @@
         ccm : "https://akless.github.io/ccm/ccm.js",
         config: {
             "tiles":[],
-            "singelTileStyle":["ccm.load", "tile-default.css"],
-            "overallStyle": ["ccm.load", "overall-default.css"],
+            "singelTileStyle":["ccm.load", "https://MoritzKemp.github.io/ccm-tile/tile-default.css"],
+            "overallStyle": ["ccm.load", "https://MoritzKemp.github.io/ccm-tile/overall-default.css"],
             "order": "asc",
             "html":{
                 "container":{
@@ -55,11 +55,13 @@
                     "tag":"div",
                     "class":"subline"
                 }
-            }
+            },
+            "router": ["ccm.start", "https://moritzkemp.github.io/ccm-route_node/ccm.route_node.js"]
         },
         Instance: function(){
             const self = this;
             let my = {};
+            let internalID = 0;
             
             this.ready = function( callback ){
                 my = self.ccm.helper.privatize(self);
@@ -68,36 +70,62 @@
             
             this.start = function( callback ){
                 render();
+                // Configure router
+                self.router.addObserver(navigateTo);
+                let patterns = [];
+                my.tiles.forEach((tile)=>{
+                    if(tile.route)
+                        patterns.push(tile.route);
+                });
+                self.router.setPatterns(patterns);
                 if(callback) callback();  
             };
             
             /* --- Public functions --- */
             
+            // Add and render a new tile
             this.addTile = function( tile, callback ){
                 let container = self.element.querySelector('.container');
+                tile.internalID = internalID++;
                 let tileElem = createTile(tile);
                 if(my.order === "asc")
                     container.appendChild(tileElem);
                 if(my.order === "desc")
                     container.insertBefore(tileElem, container.childNodes[0]);
+                my.tiles.push(tile);
                 if(callback) callback();
+            };
+            
+            // Set an action of a existing tile by its ID
+            // Action should be a function ref, otherwise ignored later
+            this.setAction = function( tileID, action ){
+                let i=0;
+                while(i<my.tiles.length){
+                    if(my.tiles[i].id === tileID)
+                        my.tiles[i].action = action;
+                    i++;
+                }
+                let tile = self.element.querySelector('.tile-id-'+tileID);
+                if(tile)
+                    tile.action = action;
             };
             
             /* --- Private functions --- */
             
-            render = function(){
+            const render = function(){
                 let container = self.ccm.helper.html(my.html.container);
                 let newTile = {};
                 
                 if(my.order === "asc") {
                     for(let i=0; i<my.tiles.length; i++){
+                        my.tiles[i].internalID = internalID++;
                         newTile = createTile( my.tiles[i] );
                         container.appendChild(newTile);
                     }
                 }
-                
                 if(my.order === "desc") {
                     for(let i=my.tiles.length-1; i>=0; i--){
+                        my.tiles[i].internalID = internalID++;
                         newTile = createTile( my.tiles[i] );
                         container.appendChild(newTile);
                     }
@@ -106,7 +134,7 @@
                 self.element.appendChild(container);
             };
             
-            createTile = function( tileData ){
+            const createTile = function( tileData ){
                 let textNode = {};
                 let iconElem = {};
                 let headlineElem = {};
@@ -129,14 +157,36 @@
                     sublineElem.appendChild(textNode);
                     newTile.appendChild(sublineElem);
                 }
+                if(tileData.id){
+                    newTile.classList.add('tile-id-'+tileData.id);
+                }
+                newTile.classList.add('internal-id-'+tileData.internalID);
                 newTile.action = tileData.action;
                 newTile.addEventListener('click', onTileClick);
                 return newTile;
             };
             
-            onTileClick = function( event ){
-                if(typeof(event.target.action) === 'function')
-                    event.target.action();
+            const onTileClick = function( event ){
+                const tileElem = event.target;
+                if(typeof(tileElem.action) === 'function')
+                    tileElem.action();
+                my.tiles.forEach((tile)=>{
+                    if(
+                        tileElem.classList.contains('internal-id-'+tile.internalID) &&
+                        tile.route
+                    ){
+                        self.router.navigatedTo(tile.route);
+                    }
+                });
+                
+            };
+            
+            const navigateTo = function( route ){
+                my.tiles.forEach((tile)=>{
+                    if(tile.route === route && typeof(tile.action) === 'function'){
+                        tile.action();
+                    }
+                });
             };
         }
     };
