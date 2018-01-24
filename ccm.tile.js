@@ -25,7 +25,7 @@
 (function(){
     var component = {
         name : "tile",
-        ccm : "https://akless.github.io/ccm/ccm.js",
+        ccm: 'https://akless.github.io/ccm/version/ccm-14.3.0.min.js',
         config: {
             "tiles":[],
             "singelTileStyle":["ccm.load", "https://MoritzKemp.github.io/ccm-tile/tile-default.css"],
